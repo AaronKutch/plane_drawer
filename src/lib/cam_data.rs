@@ -2,8 +2,8 @@
 // use common::*;
 use crate::coordinates::*;
 
-pub const MAX_FISHEYE_MULTIPLIER: D1 = D1::new_const("1000");
-pub const MIN_FISHEYE_MULTIPLIER: D1 = D1::new_const("20");
+pub const MAX_FOCAL_LEN_MULTIPLIER: D1 = D1::new_const("1000");
+pub const MIN_FOCAL_LEN_MULTIPLIER: D1 = D1::new_const("20");
 
 pub const MAX_CAMERA_SCALE: usize = 10;
 pub const MIN_CAMERA_SCALE: usize = 1;
@@ -114,12 +114,12 @@ impl CamData {
     pub fn winsize(&self) -> (usize, usize) {
         return self.winsize
     }
-    pub fn fisheye(&self) -> D1 {
+    pub fn focal_len(&self) -> D1 {
         return self.focal_len
     }
-    /// only changes fisheye_multiplier if it does not go out of bounds because a negative fishere results in a crash
-    pub fn change_fisheye_mutiplier(&mut self, add: D1) {
-        if self.focal_len_multiplier + add >= MIN_FISHEYE_MULTIPLIER && self.focal_len_multiplier + add <= MAX_FISHEYE_MULTIPLIER {
+    /// only changes focal len multiplier if it does not go out of bounds because a negative fishere results in a crash
+    pub fn change_focal_len_mutiplier(&mut self, add: D1) {
+        if self.focal_len_multiplier + add >= MIN_FOCAL_LEN_MULTIPLIER && self.focal_len_multiplier + add <= MAX_FOCAL_LEN_MULTIPLIER {
             self.focal_len_multiplier += add;
             self.update_resolution();
         }

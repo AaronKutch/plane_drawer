@@ -7,9 +7,10 @@ use common::*;
 use minifb::{Key, Window, WindowOptions};
 
 const DEFAULT_DIMENSIONS: (usize, usize) = (512, 512);
+const FPS: usize = 50;
 
 /// The inverse of the frequency of input handling
-const INPUT_PERIOD_NANOS: u128 = 1_000_000_000 / 50;
+const INPUT_PERIOD_NANOS: u128 = 1_000_000_000 / FPS as u128;
 
 fn main() {
     let mut winsize = (DEFAULT_DIMENSIONS.0, DEFAULT_DIMENSIONS.1);
@@ -17,7 +18,7 @@ fn main() {
     let mut window_buf = Vec2d::new_with_fill(winsize, |_| 0x00_00_00_00);
 
     let mut window = Window::new(
-        "Aaon's Demo",
+        "Example",
         DEFAULT_DIMENSIONS.0,
         DEFAULT_DIMENSIONS.1,
         WindowOptions {
@@ -27,7 +28,7 @@ fn main() {
     )
     .unwrap();
     // we handle the update rate ourselves
-    window.limit_update_rate(None);
+    window.set_target_fps(FPS);
     window.set_background_color(50, 50, 50);
     window.set_cursor_visibility(true);
 
@@ -151,7 +152,7 @@ fn main() {
             // it is taking longer than the input period for other parts of the main loop to
             // be processed, we are lagging
             time_fuel = INPUT_PERIOD_NANOS;
-            println!("lagging");
+            // println!("lagging");
         }
     }
 }

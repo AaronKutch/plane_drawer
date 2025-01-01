@@ -18,24 +18,14 @@ path = "src/bin/example.rs"
 
 
 [dependencies]
-minifb = "0.25"
-rand_xoshiro = {version = "0.6", features = ["serde1"]}
-triple_arena = {version = "0.12", features = ["serde_support"]}
-rayon = "1.8"
-image = "0.25"
 
-# serde
 serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-postcard = { version = "1.0", features = ["alloc"] }
-bitcode = "=0.6.0"
-
-# fixed point numbers
 fixed = {version = "1.26", features = ["serde"]}
 fixed-sqrt = "0.2.5"
 fixed_trigonometry = "0.4.3"
+minifb = "0.27"
+
 
 # my_crate = { version = "0.1", features = [] }
 # my_crate = { git = "github url", rev = "git hash of commit" }
 # my_crate = { path = "../../my_crate" }
-

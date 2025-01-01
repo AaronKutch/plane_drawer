@@ -145,7 +145,7 @@ impl Cam<'_> {
     ) -> Option<Cam<'a>> {
         let zero_pos = cam_data.zero_pos(rel_to);
 
-        if zero_pos.z() >= cam_data.fisheye() {
+        if zero_pos.z() >= cam_data.focal_len() {
             return None
         }
         let cam = Cam {
@@ -160,7 +160,7 @@ impl Cam<'_> {
     
     /// change draw plane without having to make a new cam
     pub fn change_cam_perspective(&mut self, zero_position: Pos) {
-        if zero_position.z() >= self.cam_data.fisheye() {
+        if zero_position.z() >= self.cam_data.focal_len() {
             //println!("this would have been a crash");
             return
         }
@@ -179,7 +179,7 @@ impl Cam<'_> {
             self.zero_pos.z()));
 
 
-        let cam_fish = self.cam_data.fisheye();
+        let cam_fish = self.cam_data.focal_len();
         let x = rel_point.x * cam_fish / (-rel_point.z+cam_fish);
         let y = rel_point.y * cam_fish / (-rel_point.z+cam_fish);
 
@@ -251,7 +251,7 @@ impl Cam<'_> {
     //         }
     //     }
     // }
-    
+
     pub fn draw_wide_pixel(&mut self, coords: D2<D1>, width: usize, color: Color) {
         // bottom left
         let bl = self.coords_to_cam_coords(coords);
