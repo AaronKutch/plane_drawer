@@ -3,7 +3,7 @@ use std::{
     time::{Duration, Instant}
 };
 
-use common::{geometry::*, window::*};
+use common::*;
 use minifb::{Key, Window, WindowOptions};
 
 const DEFAULT_DIMENSIONS: (usize, usize) = (512, 512);
@@ -31,16 +31,15 @@ fn main() {
     window.set_background_color(50, 50, 50);
     window.set_cursor_visibility(true);
 
-
-    // this to true
     let rerender = true;
-
     let mut time_fuel = 0u128;
     // call `Instant::now` as the last thing before the loop
     let mut old_time = Instant::now();
 
+
+
     loop {
-        // window update
+        // if window changes size
         if window.get_size() != winsize {
             winsize = window.get_size();
             cam_data.update_winsize_and_buffsize(winsize);
@@ -48,17 +47,37 @@ fn main() {
             window_buf = Vec2d::new_with_fill(new_winsize, |_| 0x00_00_00_00);
         }
 
+
+        // after setting background color, we can draw on the buffer
         window_buf.get_mut_flat1().fill(Color::new_from_u8((80, 50, 80)).to_u32());
+        // --------------------------------------------------------------
+        // draw relative to world origin
         if let Some(mut cam) = Cam::new_rel_to_pos(&mut window_buf, &cam_data, Pos::zero(), 255) {
             cam.draw_circle(D2::zero(), D1::from(5), Color::ultramarine_blue());
+            cam.draw_circle(D2::from((10, 5)), D1::from(5), Color::ultramarine_blue());
+            cam.draw_line((D2::zero(), D2::from((-10, 10))), Color::ultramarine_blue());
+            cam.draw_rect_corners((D2::from((-5, -5)), D2::from((5, -10))), Color::ultramarine_blue());
+            cam.draw_wide_pixel(D2::from((-5, -15)), 3, Color::ultramarine_blue());
         }
 
+        // draw relative to (20, 20, 50) with a 1/4 pi angle
+        if let Some(mut cam) = Cam::new_rel_to_pos(&mut window_buf, &cam_data, Pos::from((D3::from((20, 20, 50)), Angle::one_fourth_pi())), 255) {
+            cam.draw_circle(D2::zero(), D1::from(5), Color::red());
+            cam.draw_circle(D2::from((10, 5)), D1::from(5), Color::red());
+            cam.draw_line((D2::zero(), D2::from((-10, 10))), Color::red());
+            cam.draw_rect_corners((D2::from((-5, -5)), D2::from((5, -10))), Color::red());
+            cam.draw_wide_pixel(D2::from((-5, -15)), 3, Color::red());
+
+        }
+        // --------------------------------------------------------------
+
+
+        // just some minifb updating
         if rerender {
             let (width, height) = window_buf.len();
             window.update_with_buffer(window_buf.get_flat1(), width, height).unwrap();
         } else {
-            // needed for `minifb` to handle input even if `update_with_buffer` is not
-            // called
+            // needed for `minifb` to handle input even if `update_with_buffer` is not called
             window.update();
         }
         if !window.is_open() || window.is_key_down(Key::Escape) {
@@ -67,6 +86,8 @@ fn main() {
         }
 
 
+        // input handling
+        // --------------------------------------------------------------
         window.get_keys_pressed(minifb::KeyRepeat::No).iter().for_each(|key| 
             match key {
                 Key::O => {
@@ -107,6 +128,8 @@ fn main() {
                 cam_data.set_zoom(cam_data.target_zoom());
             }
         );
+        // --------------------------------------------------------------
+
 
         // efficiently wait without consuming a large amount of CPU time with a spin loop
         loop {

@@ -2,8 +2,11 @@ use std::fmt::Debug;
 use std::mem::swap;
 
 use serde::{Serialize, Deserialize};
-use common::*;
-use crate::window::{Vec2d, CamData};
+// use common::*;
+use crate::vec2d::Vec2d;
+use crate::cam_data::*;
+use crate::coordinates::*;
+use crate::shape::*;
 
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub struct Color {
@@ -126,13 +129,14 @@ pub type Bez = ((usize, usize), (usize, usize));
 
 #[derive(Debug)]
 pub struct Cam<'a> {
-    pub zero_pos: Pos, // position of target surface relative to center of screen
+    pub zero_pos: Pos, // position of draw plane relative to center of screen
     pub trig_mult: TrigMult,
     pub cam_data: &'a CamData,
     pub img: &'a mut Vec2d<u32>,
     pub alpha: u8,
 }
 impl Cam<'_> {
+    /// returns None if the z height of the draw plane is at or above the focal point of the camera (above the camera, otherwise divide by 0 errors will happen)
     pub fn new_rel_to_pos<'a>(
         img: &'a mut Vec2d<u32>,
         cam_data: &'a CamData,
@@ -154,7 +158,7 @@ impl Cam<'_> {
         return Some(cam)
     }
     
-
+    /// change draw plane without having to make a new cam
     pub fn change_cam_perspective(&mut self, zero_position: Pos) {
         if zero_position.z() >= self.cam_data.fisheye() {
             //println!("this would have been a crash");
@@ -231,6 +235,32 @@ impl Cam<'_> {
         self.draw_line((br, tr), color);
         self.draw_line((tr, tl), color);
         self.draw_line((tl, bl), color);
+    }
+
+    // pub fn draw_rect_corners_solid(&mut self, corners: (D2<D1>, D2<D1>), color: Color) {
+    //     let bl = corners.0; // bottom left
+    //     let tr = corners.1; // top right
+        
+    //     let (bl, tr) = (bl, tr).fix_corners();
+    //     let bl = self.coords_to_cam_coords(bl);
+    //     let tr = self.coords_to_cam_coords(tr);
+
+    //     for x in bl.0..tr.0 {
+    //         for y in bl.1..tr.1 {
+    //             draw_pixel(self.img, (x, y), color);
+    //         }
+    //     }
+    // }
+    
+    pub fn draw_wide_pixel(&mut self, coords: D2<D1>, width: usize, color: Color) {
+        // bottom left
+        let bl = self.coords_to_cam_coords(coords);
+
+        for x in bl.0..(bl.0 + width) {
+            for y in bl.1..(bl.1 + width) {
+                draw_pixel(self.img, (x, y), color);
+            }
+        }
     }
 
     pub fn draw_rect_prism_corners(&mut self, corners: (D3, D3), color: Color) {

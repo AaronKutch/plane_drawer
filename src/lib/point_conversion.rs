@@ -3,7 +3,8 @@ use fixed::traits::ToFixed;
 use fixed::types::I32F32;
 use fixed::types::I52F12;
 use fixed::types::I36F28;
-use common::*;
+// use common::*;
+use crate::coordinates::*;
 
 
 

@@ -1,5 +1,6 @@
 
-use common::*;
+// use common::*;
+use crate::coordinates::*;
 
 pub const MAX_FISHEYE_MULTIPLIER: D1 = D1::new_const("1000");
 pub const MIN_FISHEYE_MULTIPLIER: D1 = D1::new_const("20");
@@ -125,5 +126,31 @@ impl CamData {
     }
     pub fn view_dist(&self) -> D1 {
         return self.view_dist
+    }
+
+    /// returns the zero position of the plane we want to draw to (relative to world origin).
+    /// 
+    /// a zero pos is the position of the draw plane relative to the center of the camera.
+    /// A zero pos of {(0, 0, -50), angle: 0} would mean our draw plane is in the center of the screen 50 units below the camera and not rotated relative to the camera.
+    /// Does not take camera zoom or fisheye into acount, is just the raw coords
+    pub fn zero_pos(&self, abs_draw_plane_pos: Pos) -> Pos {
+        return Pos::new(self.zero_coords(abs_draw_plane_pos), self.zero_angle(abs_draw_plane_pos));
+    }
+
+    pub fn zero_coords(&self, abs_target_pos: Pos) -> D3 {
+        let cam_surf_abs_pos = self.current_surf_abs_pos;
+        let cam_rel_pos = self.cam_pos_rel;
+        let pos = abs_target_pos - cam_surf_abs_pos;
+
+        let trans_coords = pos.coords.rotate(-(cam_surf_abs_pos.angle + cam_rel_pos.angle));
+
+        return -cam_rel_pos.coords + trans_coords;
+    }
+
+    pub fn zero_angle(&self, abs_target_pos: Pos) -> Angle {
+        let rel_cam_angle = self.cam_pos_rel.angle;
+        let angle = abs_target_pos.angle - rel_cam_angle;
+
+        return self.current_surf_abs_pos.angle - angle
     }
 }

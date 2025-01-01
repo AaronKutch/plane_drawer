@@ -9,7 +9,8 @@ use fixed::types::I52F12;
 use fixed::types::I36F28;
 use fixed_trigonometry::*;
 
-use common::*;
+// use common::*;
+use crate::shape::*;
 
 impl Add for D1 {
     type Output = Self;
