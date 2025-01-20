@@ -2,9 +2,8 @@ use std::{
     thread,
     time::{Duration, Instant}
 };
-
-use common::*;
 use minifb::{Key, Window, WindowOptions};
+use plane_drawer::{Angle, Cam, CamData, Color, Pos, Vec2d, D1, D2, D3};
 
 const DEFAULT_DIMENSIONS: (usize, usize) = (512, 512);
 const FPS: usize = 50;
